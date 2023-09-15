@@ -16,4 +16,5 @@ type Purchase struct {
 	total              money.Money
 	PaymentMeans       payment.Means
 	timeOfPurchase     time.Time
+	CardToken          *string
 }
