@@ -1,4 +1,4 @@
-package main
+package ch02
 
 import (
 	"errors"
