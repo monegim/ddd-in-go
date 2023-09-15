@@ -2,6 +2,7 @@ package purchase
 
 import (
 	coffeeco "coffeeco/internal"
+	"coffeeco/internal/payment"
 	"coffeeco/internal/store"
 	"github.com/Rhymond/go-money"
 	"github.com/google/uuid"
