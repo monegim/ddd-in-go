@@ -4,6 +4,7 @@ import (
 	coffeeco "coffeeco/internal"
 	"coffeeco/internal/payment"
 	"coffeeco/internal/store"
+	"context"
 	"errors"
 	"github.com/Rhymond/go-money"
 	"github.com/google/uuid"
@@ -37,4 +38,36 @@ func (p *Purchase) validateAndEnrich() error {
 	p.timeOfPurchase = time.Now()
 
 	return nil
+}
+
+type CardChargeService interface {
+	ChargeCard(ctx context.Context, amount money.Money, cardToken string) error
+}
+
+//type StoreService interface {
+//	GetStoreSpecificDiscount(ctx context.Context, storeID uuid.UUID) (float32, error)
+//}
+
+type Service struct {
+	cardService  CardChargeService
+	purchaseRepo Repository
+	//storeService StoreService
+}
+
+func (s Service) CompletePurchase(ctx context.Context, purchase *Purchase) error {
+	if err := purchase.validateAndEnrich(); err != nil {
+		return err
+	}
+	switch purchase.PaymentMeans {
+	case payment.MEANS_CARD:
+		if err := s.cardService.ChargeCard(ctx, purchase.total, *purchase.CardToken); err != nil {
+			return errors.New("card charge failed, cancelling purchase")
+		}
+	case payment.MEANS_CASH:
+	//TODO:
+	default:
+		return errors.New("unknown payment type")
+
+	}
+	if err := s.purchaseRepo
 }
