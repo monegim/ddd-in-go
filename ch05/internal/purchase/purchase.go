@@ -2,6 +2,7 @@ package purchase
 
 import (
 	coffeeco "coffeeco/internal"
+	"coffeeco/internal/loyalty"
 	"coffeeco/internal/payment"
 	"coffeeco/internal/store"
 	"context"
@@ -54,7 +55,7 @@ type Service struct {
 	//storeService StoreService
 }
 
-func (s Service) CompletePurchase(ctx context.Context, purchase *Purchase) error {
+func (s Service) CompletePurchase(ctx context.Context, purchase *Purchase, coffeeBuxCard *loyalty.CoffeeBux) error {
 	if err := purchase.validateAndEnrich(); err != nil {
 		return err
 	}
@@ -65,9 +66,17 @@ func (s Service) CompletePurchase(ctx context.Context, purchase *Purchase) error
 		}
 	case payment.MEANS_CASH:
 	//TODO:
+	//case payment.MEANS_CASHS_COFFEEBUX:
+	//	if err := coff
 	default:
 		return errors.New("unknown payment type")
 
 	}
-	if err := s.purchaseRepo
+	if err := s.purchaseRepo.Store(ctx, *purchase); err != nil {
+		return errors.New("failed to Store purchase")
+	}
+	if coffeeBuxCard != nil {
+		coffeeBuxCard.AddStamp()
+	}
+	return nil
 }
