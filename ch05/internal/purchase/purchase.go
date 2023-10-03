@@ -7,6 +7,7 @@ import (
 	"coffeeco/internal/store"
 	"context"
 	"errors"
+	"fmt"
 	"github.com/Rhymond/go-money"
 	"github.com/google/uuid"
 	"time"
@@ -68,6 +69,10 @@ func (s Service) CompletePurchase(ctx context.Context, purchase *Purchase, coffe
 	//TODO:
 	//case payment.MEANS_CASHS_COFFEEBUX:
 	//	if err := coff
+	case payment.MEANS_COFFEEBUX:
+		if err := coffeeBuxCard.Pay(ctx, purchase.ProductsToPurchase); err != nil {
+			return fmt.Errorf("failed to charge loyalty card: %w", err)
+		}
 	default:
 		return errors.New("unknown payment type")
 
